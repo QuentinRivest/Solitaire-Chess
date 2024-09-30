@@ -1,0 +1,3 @@
+When you enter an invalid coordinate to select a piece, when you try the next time it won't work.
+For lvl 6, I tried as first move to select knight at 3c but had to type as 3C (not sure if it was a case issue or just that the coordinate was just messing up and happened to work that time).
+Also for lvl 6, the queen was at 4A and the knight was at 1A (meaning queen was in position to attack knight) and when trying to select queen, it said that it had no valid moves (but it did).

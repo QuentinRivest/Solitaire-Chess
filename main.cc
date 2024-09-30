@@ -4,53 +4,53 @@
 #include "chessboard.h"
 #include "piece.h"
 
-namespace g {
+namespace {
   const std::string line{
   "-----------------------------------------------------------------------\n"
   };
-}
 
-void testPrintPieces() {
-  for (int i = 0; i <= 6; i++) {
-    Piece piece{i, {2, 2}};
+  void testPrintPieces() {
+    for (int i = 0; i <= 6; i++) {
+      Piece piece{i, {2, 2}};
 
-    std::cout << "Name: " << piece.getName() << "\n"
-              << "Position: (" << piece.getPosition().first << ", "
-              << piece.getPosition().second << ")\n"
-              << "Range: ";
-    for (const std::pair<int, int>& coordinate : piece.getRange()) {
-      if (coordinate == piece.getRange().at(0)) {
-        std::cout << "(" << coordinate.first << ", " << coordinate.second
+      std::cout << "Name: " << piece.getName() << "\n"
+                << "Position: (" << piece.getPosition().first << ", "
+                << piece.getPosition().second << ")\n"
+                << "Range: ";
+      for (const std::pair<int, int>& coordinate : piece.getRange()) {
+        if (coordinate == piece.getRange().at(0)) {
+          std::cout << "(" << coordinate.first << ", " << coordinate.second
+                    << ")";
+          continue;
+        }
+        std::cout << ", " << "(" << coordinate.first << ", " << coordinate.second
                   << ")";
-        continue;
       }
-      std::cout << ", " << "(" << coordinate.first << ", " << coordinate.second
-                << ")";
+      std::cout << "\nImage:\n";
+      for (const std::string& line : piece.getImage()) {
+        std::cout << line << "\n";
+      }
+      std::cout << "\n";
     }
-    std::cout << "\nImage:\n";
-    for (const std::string& line : piece.getImage()) {
-      std::cout << g::line << "\n";
-    }
-    std::cout << "\n";
   }
-}
 
-void enter_and_example() {
-  std::string trash;
-  std::cout << "Press [ENTER] to continue. ";
-  std::getline(std::cin, trash);
-  std::cout << g::line << "EXAMPLE BOARD:\n";
-}
+  void enter_and_example() {
+    std::string trash;
+    std::cout << "Press [ENTER] to continue. ";
+    std::getline(std::cin, trash);
+    std::cout << line << "EXAMPLE BOARD:\n";
+  }
 
-void enter_to_continue() {
-  std::string trash;
-  std::cout << "Press [ENTER] to continue. ";
-  std::getline(std::cin, trash);
+  void enter_to_continue() {
+    std::string trash;
+    std::cout << "Press [ENTER] to continue. ";
+    std::getline(std::cin, trash);
+  }
 }
 
 int main(int argc, char* argv[]) {
   // explain rules to user
-  std::cout << g::line << "\t\t\t    SOLITAIRE CHESS\n" << g::line;
+  std::cout << line << "\t\t\t    SOLITAIRE CHESS\n" << line;
   std::cout << "Solitaire Chess is a one-player game with chess pieces and "
             << "a 4x4 board.\n\n";
   enter_and_example();
@@ -91,30 +91,30 @@ int main(int argc, char* argv[]) {
   ex2_board.updateBoard({2, 1}, {3, 2});
   ex2_board.printBoard();
   enter_and_example();
-  
+
   ex2_board.updateBoard({3, 2}, {4, 3});
   ex2_board.printBoard();
-  std::cout << "\n" << g::line << "\t\t\t    END OF TUTORIAL\n"
-            << g::line << "\n";
+  std::cout << "\n" << line << "\t\t\t    END OF TUTORIAL\n"
+            << line << "\n";
   enter_to_continue();
   std::cout << "\n\n";
 
   int level{ 1 };
-  
+
   while (true) { // LOOP1: this loop containes whole operation of game
     // print main menu
-    std::cout << g::line << "\t\t\t      LEVEL SELECT\n" << g::line;
+    std::cout << line << "\t\t\t      LEVEL SELECT\n" << line;
     std::cout << "Easy:\n\t[ 1] [ 2] [ 3] [ 4] [ 5]\n\n"
               << "Intermediate:\n\t[ 6] [ 7] [ 8] [ 9] [10]\n\n"
               << "Advanced:\n\t[11] [12] [13] [14] [15]\n\n"
               << "Expert:\n\t[16] [17] [18] [19] [20]\n\n"
-              << g::line << "\t\t\t\t QUIT\n" << g::line
+              << line << "\t\t\t\t QUIT\n" << line
               << "\nEnter the number of the level you'd like to enter,\nor "
               << "enter \"q\" to quit: ";
     std::string lvl_choice;
     std::getline(std::cin, lvl_choice);
 
-    std::cout << "\n" << g::line << "\n";
+    std::cout << "\n" << line << "\n";
 
     if (lvl_choice.empty()) {
       std::cout << "Please try again.\n\n";
@@ -124,7 +124,7 @@ int main(int argc, char* argv[]) {
       break;
       // if the first char in lvl_choice is a digit between 1 and 9, inclusive
     } else if (std::isdigit(lvl_choice.at(0)) && (lvl_choice.at(0) > 48) &&
-                (lvl_choice.at(0) < 58)) {        
+                (lvl_choice.at(0) < 58)) {
       level = std::stoi(lvl_choice.substr(0,1));
       // if lvl_choice is longer than 1 AND a digit AND either:
       //  (level is currently 1 AND the 2nd char in lvl_choice is between 0
@@ -163,7 +163,7 @@ int main(int argc, char* argv[]) {
       std::getline(std::cin, user_choice);
 
       // horizontal line for spacing out text
-      std::cout << "\n" << g::line << "\n";
+      std::cout << "\n" << line << "\n";
       // if the user doesn't choose to 'go back to main menu' or 'restart',
       // they'll select coordinate of the piece they wish to move;
       // it's this coordinate -- their piece's starting position -- that this
@@ -183,7 +183,7 @@ int main(int argc, char* argv[]) {
                   (user_choice.at(0) == 'R') )) {
           // ^if this is not the first move in the level,
           // AND if the first character in the user's input is 'r' or 'R'...
-        
+
         // makes a new Chessboard obj that is the same setup at the beginning of
         // 'level' (which's the level the user's currently on)...
         Chessboard new_board{ level };
@@ -233,7 +233,7 @@ int main(int argc, char* argv[]) {
         } else {
             // ^if, either, the coordinate DOESN'T exist,
             // OR if that coordinate is unoccupied...
-          
+
           // asks the user to try again
           std::cout << "Please try again with an occupied spot on the board."
                     << "\n\n";
@@ -247,7 +247,7 @@ int main(int argc, char* argv[]) {
           // if the first character of the user's input is NOT epmty, isn't an
           // upper-/lower-case 'r' or 'b', and isn't more than 1 character
           // long...
-        
+
         // asks the user to try again
         std::cout << "Please try again.\n\n";
         // haults progression of program till user presses 'enter'
@@ -259,14 +259,14 @@ int main(int argc, char* argv[]) {
       // if this's the first move at this point in the level, then set
       // 'is_first_move' to false for the next time around in the loop
       if (is_first_move) { is_first_move = false; }
-      
+
       // prints out line to space out text
-      std::cout << "\n" << g::line << "\n";
+      std::cout << "\n" << line << "\n";
 
       // true if level is beaten, remains false otherwise
       bool level_beaten{false};
       while (true) { // LOOP 3: loops until user chooses valid move
-        // gives user the options of where to move 
+        // gives user the options of where to move
         board.printBoard();
 
         // tells user that the following list is going to the be their options
@@ -298,7 +298,7 @@ int main(int argc, char* argv[]) {
         std::getline(std::cin, mv_choice);
 
         // horizontal line to space out text
-        std::cout << "\n" << g::line << "\n";
+        std::cout << "\n" << line << "\n";
 
         // if user input no characters...
         if (mv_choice.empty()) {
@@ -324,7 +324,7 @@ int main(int argc, char* argv[]) {
           // 'initial_spot' then being filled with an empty Piece obj;
           // this is basically a piece taking another piece
           board.updateBoard(initial_spot, new_spot);
-          
+
           // counts how many pieces are on the board
           int counter{0};
           for (const Piece& piece : board.getBoard()) {
@@ -352,7 +352,7 @@ int main(int argc, char* argv[]) {
                     << coordToDisplay(new_spot) << ".\n\n";
           // haults prograssion till user presses 'enter'
           enter_to_continue();
-          // 
+          //
           break;
         } else {
             // ^if 'mv_choice' is NOT a digit that is within the range 1-n

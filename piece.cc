@@ -1,33 +1,33 @@
-// definitions of (non-)member 
+// definitions of (non-)member
 #include <iostream>
 
 #include "piece.h"
 
 // constructor for a chess piece
-Piece::Piece(int piece_id, const std::pair<int, int>& position)
-  : piece_id_(piece_id), position_(position), name_(createName(piece_id)),
-    range_(createRange(piece_id, position)), image_(createImage(piece_id)) {}
+Piece::Piece(PieceType piece_type, const std::pair<int, int>& position)
+  : piece_type_(piece_type), position_(position), name_(createName(piece_type)),
+    range_(createRange(piece_type, position)), image_(createImage(piece_type)) {}
 
 // returns the one-digit ID of a chess piece
-int Piece::getPieceId() const {
-  return piece_id_;
+PieceType Piece::getPieceId() const {
+  return piece_type_;
 }
 
 // sets a name for chess piece given its piece ID; used in Piece constructor
-std::string createName(int piece_id) {
-  if (piece_id == 0) {
+std::string createName(PieceType piece_type) {
+  if (piece_type == PieceType::EMPTY) {
     return "Empty";
-  } else if (piece_id == 1) {
+  } else if (piece_type == PieceType::PAWN) {
     return "Pawn";
-  } else if (piece_id == 2) {
+  } else if (piece_type == PieceType::ROOK) {
     return "Rook";
-  } else if (piece_id == 3) {
+  } else if (piece_type == PieceType::KNIGHT) {
     return "Knight";
-  } else if (piece_id == 4) {
+  } else if (piece_type == PieceType::BISHOP) {
     return "Bishop";
-  } else if (piece_id == 5) {
+  } else if (piece_type == PieceType::QUEEN) {
     return "Queen";
-  } else if (piece_id == 6) {
+  } else if (piece_type == PieceType::KING) {
     return "King";
   } else {
     std::cout << "error: tried to create name for non-chess-piece\n";
@@ -35,20 +35,14 @@ std::string createName(int piece_id) {
   }
 }
 
-// returns the name of a chess piece
 std::string Piece::getName() const {
   return name_;
 }
 
-//
-
-// sets a new position for a chess piece
 void Piece::setPosition(const std::pair<int, int>& position) {
   position_ = position;
 }
 
-// returns the two-digit position of a chess piece
-// ten's place = column, one's place = rows
 std::pair<int, int> Piece::getPosition() const {
   return position_;
 }
@@ -64,13 +58,13 @@ bool coordExists(std::pair<int, int> coord) {
 
 // sets the range for a chess piece, depending on what type of piece it is and
 // where it is on the board
-std::vector<std::pair<int, int>> createRange(int piece_id,
+std::vector<std::pair<int, int>> createRange(PieceType piece_type,
                                              const std::pair<int, int>&
                                              position) {
   // if the piece is an empty space
-  if (piece_id == 0) {
+  if (piece_type == PieceType::EMPTY) {
     return {{0, 0}};
-  } else if (piece_id == 1) {  // if the piece is a pawn
+  } else if (piece_type == PieceType::PAWN) {  // if the piece is a pawn
     // vector of pairs for range of pawn moves
     std::vector<std::pair<int, int>> pawn_range{};
     // if there's one move north of current position is in board range...
@@ -90,7 +84,7 @@ std::vector<std::pair<int, int>> createRange(int piece_id,
       pawn_range.push_back({0,0});
     }
     return pawn_range;
-  } else if (piece_id == 2) {  // if the piece is a rook
+  } else if (piece_type == PieceType::ROOK) {  // if the piece is a rook
     // vector of pairs for range of rook moves
     std::vector<std::pair<int, int>> rook_range{};
     for (int i = 1; (position.first + i) <= 4; i++) {
@@ -114,7 +108,7 @@ std::vector<std::pair<int, int>> createRange(int piece_id,
       rook_range.push_back({position.first, (position.second - i)});
     }
     return rook_range;
-  } else if (piece_id == 3) {  // if the piece is a knight
+  } else if (piece_type == PieceType::KNIGHT) {  // if the piece is a knight
     // vector of pairs for range of knight moves
     std::vector<std::pair<int, int>> knight_range{};
     // if the knight can move up 2...
@@ -166,7 +160,7 @@ std::vector<std::pair<int, int>> createRange(int piece_id,
       }
     }
     return knight_range;
-  } else if (piece_id == 4) {  // if the piece is a bishop
+  } else if (piece_type == PieceType::BISHOP) {  // if the piece is a bishop
     // vector of pairs for range of bishop moves
     std::vector<std::pair<int, int>> bishop_range{};
     // concerning coordinates in board range and north of current position...
@@ -196,7 +190,7 @@ std::vector<std::pair<int, int>> createRange(int piece_id,
       }
     }
     return bishop_range;
-  } else if (piece_id == 5) {  // if the piece is a queen
+  } else if (piece_type == PieceType::QUEEN) {  // if the piece is a queen
     // vector of pairs for range of queen moves
     std::vector<std::pair<int, int>> queen_range{};
     // concerning coordinates in board range and north of current position...
@@ -242,7 +236,7 @@ std::vector<std::pair<int, int>> createRange(int piece_id,
       queen_range.push_back({position.first, (position.second - i)});
     }
     return queen_range;
-  } else if (piece_id == 6) {  // if the piece is a king
+  } else if (piece_type == PieceType::KING) {  // if the piece is a king
     // vector of pairs for range of king moves
     std::vector<std::pair<int, int>> king_range{};
     // if coordinate one move north of current position is in range...
@@ -299,7 +293,7 @@ std::vector<std::pair<int, int>> createRange(int piece_id,
 
 // sets range for a chess piece
 void Piece::setRange() {
-  range_ = createRange(piece_id_, position_);
+  range_ = createRange(piece_type_, position_);
 }
 
 
@@ -309,8 +303,8 @@ std::vector<std::pair<int, int>> Piece::getRange() const {
 }
 
 // creates the image of a chess piece given the piece ID
-std::vector<std::string> createImage(int piece_id) {
-  if (piece_id == 0) {
+std::array<std::string, 7> createImage(PieceType piece_type) {
+  if (piece_type == PieceType::EMPTY) {
     return {"|               ",
             "|               ",
             "|               ",
@@ -318,7 +312,7 @@ std::vector<std::string> createImage(int piece_id) {
             "|               ",
             "|               ",
             "----------------"};
-  } else if (piece_id == 1) {
+  } if (piece_type == PieceType::PAWN) {
     return {"|               ",
             "|       _       ",
             "|      (_)      ",
@@ -326,7 +320,7 @@ std::vector<std::string> createImage(int piece_id) {
             "|    (_____)    ",
             "|               ",
             "----------------"};
-  } else if (piece_id == 2) {
+  } else if (piece_type == PieceType::ROOK) {
     return {"|               ",
             "|     |UUU|     ",
             "|      |_|      ",
@@ -334,7 +328,7 @@ std::vector<std::string> createImage(int piece_id) {
             "|    (_____)    ",
             "|               ",
             "----------------"};
-  } else if (piece_id == 3) {
+  } else if (piece_type == PieceType::KNIGHT) {
     return {"|               ",
             "|    ____|\\     ",
             "|    L__  |7    ",
@@ -342,7 +336,7 @@ std::vector<std::string> createImage(int piece_id) {
             "|     (___)     ",
             "|    (_____)    ",
             "----------------"};
-  } else if (piece_id == 4) {
+  } else if (piece_type == PieceType::BISHOP) {
     return {"|               ",
             "|       o       ",
             "|      (/)      ",
@@ -350,7 +344,7 @@ std::vector<std::string> createImage(int piece_id) {
             "|     _)_(_     ",
             "|    (_____)    ",
             "----------------"};
-  } else if (piece_id == 5) {
+  } else if (piece_type == PieceType::QUEEN) {
     return {"|       o       ",
             "|     \\^^^/     ",
             "|     <___>     ",
@@ -358,7 +352,7 @@ std::vector<std::string> createImage(int piece_id) {
             "|     (___)     ",
             "|    (_____)    ",
             "----------------"};
-  } else if (piece_id == 6) {
+  } else if (piece_type == PieceType::KING) {
     return {"|      _+_      ",
             "|     \\___/     ",
             "|      )_(      ",
