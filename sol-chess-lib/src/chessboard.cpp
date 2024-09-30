@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "chessboard.h"
+#include "include/chessboard.h"
 
 // constructor for chessboard
 Chessboard::Chessboard(int level)
@@ -87,7 +87,7 @@ std::vector<std::pair<int, int>> Chessboard::getMoves(
   // 'board_.at(coordToIndex(position))'
   Piece piece = board_.at(coordToIndex(position));
   std::vector<std::pair<int, int>> moves{};
-  
+
   // if 'piece' is a bishop or queen (i.e., if it moves diagonally)
   if ((piece.getPieceId() == 4) || (piece.getPieceId() == 5)) {
     for (const std::pair<int, int>& range_coord : piece.getRange()) {
@@ -250,7 +250,7 @@ std::pair<int, int> displayToCoord(const std::string& disp_coord) {
   if (std::isdigit(disp_coord.at(0)) &&
       ((std::stoi(disp_coord.substr(0,1)) >= 1 ||
         std::stoi(disp_coord.substr(0, 1)) <= 4))) {
-    
+
     int digit2{0};
     if ((disp_coord.at(1) >= 'a') && (disp_coord.at(1) <= 'd')) {
       // store the number in "digit2" that corresponds to letter (e.g., 'a' = 1)
@@ -309,7 +309,7 @@ int coordToIndex(const std::pair<int, int>& coord) {
     std::cout << "error: no known coordinate of that value.\n";
     return -1;
   }
-  // returns an index int within the range 0-15,  
+  // returns an index int within the range 0-15,
   return (-4) * ((coord.first) - 4) + ((coord.second) - 1);
 }
 
@@ -364,7 +364,7 @@ std::array<Piece, 16> setUpBoard(int level) {
   // creates a list of all the piece IDs in left-right, top-bottom order, and in
   // the order they'll be in the beginning of the level number in the parameter
   std::array<int, 16> id_list(getStartingBoard(level));
-  
+
   // creates an array of Piece objects and fills it with the correct pieces at
   // the correct places according to the id_list array
   std::array<Piece, 16> chess_board{};

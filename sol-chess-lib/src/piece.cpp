@@ -1,7 +1,7 @@
 // definitions of (non-)member
 #include <iostream>
 
-#include "piece.h"
+#include "include/piece.h"
 
 // constructor for a chess piece
 Piece::Piece(PieceType piece_type, const std::pair<int, int>& position)
