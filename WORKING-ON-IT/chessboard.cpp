@@ -55,8 +55,6 @@ void Chessboard::updateBoard(const std::pair<int, int>& old_pos,
   (*this)[new_pos] = (*this)[old_pos];
   // resets the moved Piece obj's stored position value
   (*this)[new_pos].setPosition(new_pos);
-  // resets the moved Piece obj/s stored range vector value
-  (*this)[new_pos].setRange();
   // sets Piece obj at 'old_pos' equal to an empty Piece obj
   (*this)[old_pos] = Piece{PieceType::PieceType::EMPTY, old_pos};
 }
@@ -82,163 +80,230 @@ std::vector<std::pair<int, int>> Chessboard::getMoves(const std::pair<int, int>&
     return {{-1, -1}};
   }
 
-  // construct new Piece obj 'piece' equal to Piece obj at coord of 'position';
-  // this way 'piece' can be used each time rather than
-  // '(*this)[position]'
-  Piece piece = (*this)[position];
+  const PieceType::PieceType piece_type = (*this)[position].getPieceType();
+
   std::vector<std::pair<int, int>> moves{};
 
-  // if 'piece' is a bishop or queen (i.e., if it moves diagonally)
-  if ((piece.getPieceType() == 4) || (piece.getPieceType() == 5)) {
-    for (const std::pair<int, int>& range_coord : piece.getRange()) {
-      // if 'range_coord' is NE of 'piece''s position,
-      // and if 'range_coord' is occupied by another piece...
-      if ((range_coord.first > position.first) &&
-          (range_coord.second > position.second) &&
-          (spotOccupied(range_coord))) {
-        // ...add that coordinate to 'piece''s possible moves...
-        moves.push_back(range_coord);
-        // ...and break loop
-        // (since, if there's a piece in a given direction, 'piece' can't go
-        // any further that direction)
-        break;
-      }
-    }
-    // for each coordinate in 'piece''s range...
-    for (const std::pair<int, int>& range_coord : piece.getRange()) {
-      // if 'range_coord' is NW of 'piece''s position,
-      // and if 'range_coord' is occupied by another piece...
-      if ((range_coord.first > position.first) &&
-          (range_coord.second < position.second) &&
-          (spotOccupied(range_coord))) {
-        // ...add that coordinate to 'piece''s possible moves...
-        moves.push_back(range_coord);
-        // ...and break loop
-        // (since, if there's a piece in a given direction, 'piece' can't go
-        // any further that direction)
-        break;
-      }
-    }
-    // for each coordinate in 'piece''s range...
-    for (const std::pair<int, int>& range_coord : piece.getRange()) {
-      // if 'range_coord' is SE of 'piece''s position,
-      // and if 'range_coord' is occupied by another piece...
-      if ((range_coord.first < position.first) &&
-          (range_coord.second > position.second) &&
-          (spotOccupied(range_coord))) {
-        // ...add that coordinate to 'piece''s possible moves...
-        moves.push_back(range_coord);
-        // ...and break loop
-        // (since, if there's a piece in a given direction, 'piece' can't go
-        // any further that direction)
-        break;
-      }
-    }
-    // for each coordinate in 'piece''s range...
-    for (const std::pair<int, int>& range_coord : piece.getRange()) {
-      // if 'range_coord' is SW of 'piece''s position,
-      // and if 'range_coord' is occupied by another piece...
-      if ((range_coord.first < position.first) &&
-          (range_coord.second < position.second) &&
-          (spotOccupied(range_coord))) {
-        // ...add that coordinate to 'piece''s possible moves...
-        moves.push_back(range_coord);
-        // ...and break loop
-        // (since, if there's a piece in a given direction, 'piece' can't go
-        // any further that direction)
-        break;
-      }
-    }
-  }
+  using namespace PieceType;
 
-  // bishop/queen conditional is before others because if 'piece' is a queen,
-  // it'll get its diagonal moves first in the above conditional block,
-  // and then it's horizontal/vertical moves in the rook/queen conditional
-  // block below
-
-  // if the 'piece' is an empty spot
-  if (piece.getPieceType() == 0) {
+  if (piece_type == EMPTY) {
     std::cout << "error: tried to get moves of empty piece.\n";
     return {{0, 0}};
-  } else if ((piece.getPieceType() == 1) || (piece.getPieceType() == 3) ||
-             (piece.getPieceType() == 6)) {  // if 'piece' is pawn, knight, king
-    // for each coordinate in 'piece''s range...
-    for (const std::pair<int, int>& coord : piece.getRange()) {
-      // ...if that coordinate is occupied by another Piece obj...
-      if (spotOccupied(coord)) {
-        // ...add that coordinate to 'piece''s possible moves
-        // (since, for this game, each move has to be an attack)
-        moves.push_back(coord);
+  } else if (piece_type == PAWN) {
+    // north
+    if (int y = position.first + 1; y <= 4) {
+      // northeast
+      if (int x = position.second + 1; x <= 4 && spotOccupied({y, x})) {
+        moves.push_back({y, x});
+      }
+      // northwest
+      if (int x = position.second - 1; x >= 1 && spotOccupied({y, x})) {
+        moves.push_back({y, x});
       }
     }
-    return moves;
-  } else if ((piece.getPieceType() == 2) || (piece.getPieceType() == 5)) {
-      // ^if piece is a rook or queen (i.e., vertical/horizontal-moving piece)
-    // (4 diff. for each loops for 4 diff. directions the piece could go)
-    // for each coordinate in 'piece''s range...
-    for (const std::pair<int, int>& range_coord : piece.getRange()) {
-      // if 'range_coord' is strictly NORTH (not NW/NE) of 'piece''s position,
-      // and if 'range_coord' is occupied by another piece...
-      if ((range_coord.first > position.first) &&
-          (range_coord.second == position.second) &&
-          (spotOccupied(range_coord))) {
-        // ...add that coordinate to 'piece''s possible moves...
-        moves.push_back(range_coord);
-        // ...and break loop
-        // (since, if there's a piece in a given direction, 'piece' can't go
-        // any further that direction)
+  } else if (piece_type == ROOK) {
+
+    // north
+    for (int y = position.first + 1; y <= 4; y++) {
+      if (std::pair<int, int> curr_coord = {y, position.second}; spotOccupied(curr_coord)) {
+        moves.push_back({y, position.second});
         break;
       }
     }
-    // for each coordinate in 'piece''s range...
-    for (const std::pair<int, int>& range_coord : piece.getRange()) {
-      // if 'range_coord' is strictly SOUTH (not SW/SE) of 'piece''s position,
-      // and if 'range_coord' is occupied by another piece...
-      if ((range_coord.first < position.first) &&
-          (range_coord.second == position.second) &&
-          (spotOccupied(range_coord))) {
-        // ...add that coordinate to 'piece''s possible moves...
-        moves.push_back(range_coord);
-        // ...and break loop
-        // (since, if there's a piece in a given direction, 'piece' can't go
-        // any further that direction)
+    // east
+    for (int x = position.second + 1; x <= 4; x++) {
+      if (std::pair<int, int> curr_coord = {position.first, x}; spotOccupied(curr_coord)) {
+        moves.push_back(curr_coord);
         break;
       }
     }
-    // for each coordinate in 'piece''s range...
-    for (const std::pair<int, int>& range_coord : piece.getRange()) {
-      // if 'range_coord' is strictly EAST (not NE/SE) of 'piece''s position,
-      // and if 'range_coord' is occupied by another piece...
-      if ((range_coord.first == position.first) &&
-          (range_coord.second > position.second) &&
-          (spotOccupied(range_coord))) {
-        // ...add that coordinate to 'piece''s possible moves...
-        moves.push_back(range_coord);
-        // ...and break loop
-        // (since, if there's a piece in a given direction, 'piece' can't go
-        // any further that direction)
+    // south
+    for (int y = position.first - 1; y >= 1; y--) {
+      if (std::pair<int, int> curr_coord = {y, position.second}; spotOccupied(curr_coord)) {
+        moves.push_back(curr_coord);
         break;
       }
     }
-    // for each coordinate in 'piece''s range...
-    for (const std::pair<int, int>& range_coord : piece.getRange()) {
-      // if 'range_coord' is strictly WEST (not NW/SW) of 'piece''s position,
-      // and if 'range_coord' is occupied by another piece...
-      if ((range_coord.first == position.first) &&
-          (range_coord.second < position.second) &&
-          (spotOccupied(range_coord))) {
-        // ...add that coordinate to 'piece''s possible moves...
-        moves.push_back(range_coord);
-        // ...and break loop
-        // (since, if there's a piece in a given direction, 'piece' can't go
-        // any further that direction)
+    // west
+    for (int x = position.second - 1; x >= 1; x--) {
+      if (std::pair<int, int> curr_coord = {position.first, x}; spotOccupied(curr_coord)) {
+        moves.push_back(curr_coord);
         break;
       }
     }
-    return moves;
-  } else {
-    std::cout << "error: tried to get moves of non-existent piece.\n";
-    moves.push_back({-1, -1});
+
+  } else if (piece_type == KNIGHT) {
+
+    // north 2
+    if (int y = position.first + 2; y <= 4) {
+      // east 1
+      if (int x = position.second + 1; x <= 4 && spotOccupied({y, x})) {
+        moves.push_back({y, x});
+      }
+      // west 1
+      if (int x = position.second - 1; x >= 1 && spotOccupied({y, x})) {
+        moves.push_back({y, x});
+      }
+    } else if (int y = position.first - 2; y >= 1) {  // south 2
+      // east 1
+      if (int x = position.second; x <= 4 && spotOccupied({y, x})) {
+        moves.push_back({y, x});
+      }
+      // west 1
+      if (int x = position.second - 1; x >= 1 && spotOccupied({y, x})) {
+        moves.push_back({y, x});
+      }
+    }
+    //  east 2
+    if (int x = position.second + 2; x <= 4) {
+      // north 1
+      if (int y = position.first + 1; y <= 4 && spotOccupied({y, x})) {
+        moves.push_back({y, x});
+      }
+      // south 1
+      if (int y = position.first - 1; y >= 1 && spotOccupied({y, x})) {
+        moves.push_back({y, x});
+      }
+    } else if (int x = position.second - 2; x >= 1) {  // west 2
+      // north 1
+      if (int y = position.first + 1; y <= 4 && spotOccupied({y, x})) {
+        moves.push_back({y, x});
+      }
+      // south 1
+      if (int y = position.first - 1; y >= 1 && spotOccupied({y, x})) {
+        moves.push_back({y, x});
+      }
+    }
+
+  } else if (piece_type == BISHOP) {
+
+    bool east_is_clear{true}, west_is_clear{true};
+
+    // north
+    for (int y = position.first + 1; y <= 4; y++) {
+      // northeast
+      if (int x = position.second + (y - position.first); east_is_clear && x <= 4 && spotOccupied({y, x})) {
+        moves.push_back({y, x});
+        east_is_clear = false;
+      }
+      // northwest
+      if (int x = position.second - (y - position.first); west_is_clear && x >= 1 && spotOccupied({y, x})) {
+        moves.push_back({y, x});
+        west_is_clear = false;
+      }
+    }
+
+    east_is_clear = west_is_clear = true;
+
+    // south
+    for (int y = position.first - 1; y >= 1; y--) {
+      // southeast
+      if (int x = position.second - (y - position.first); east_is_clear && x <= 4 && spotOccupied({y, x})) {
+        moves.push_back({y, x});
+        east_is_clear = false;
+      }
+      // southwest
+      if (int x = position.second + (y - position.first); west_is_clear && x >= 1 && spotOccupied({y, x})) {
+        moves.push_back({y, x});
+        west_is_clear = false;
+      }
+    }
+
+  } else if (piece_type == QUEEN) {
+
+    bool north_is_clear{true}, east_is_clear{true}, west_is_clear{true};
+
+    // north
+    for (int y = position.first + 1; y <= 4; y++) {
+      if (north_is_clear && spotOccupied({y, position.second})) {
+        moves.push_back({y, position.second});
+        north_is_clear = false;
+      }
+
+      // northeast
+      if (int x = position.second + (y - position.first); east_is_clear && x <= 4 && spotOccupied({y, x})) {
+        moves.push_back({y, x});
+        east_is_clear = false;
+      }
+      // northwest
+      if (int x = position.second - (y - position.first); west_is_clear && x >= 1 && spotOccupied({y, x})) {
+        moves.push_back({y, x});
+        west_is_clear = false;
+      }
+    }
+
+    // east
+    for (int x = position.second + 1; x <= 4; x++) {
+      if (std::pair<int, int> curr_coord = {position.first, x}; spotOccupied(curr_coord)) {
+        moves.push_back(curr_coord);
+        break;
+      }
+    }
+
+    bool south_is_clear = east_is_clear = west_is_clear = true;
+
+    // south
+    for (int y = position.first - 1; y >= 1; y--) {
+      if (north_is_clear && spotOccupied({y, position.second})) {
+        moves.push_back({y, position.second});
+        south_is_clear = false;
+      }
+
+      // southeast
+      if (int x = position.second - (y - position.first); east_is_clear && x <= 4 && spotOccupied({y, x})) {
+        moves.push_back({y, x});
+        east_is_clear = false;
+      }
+      // southwest
+      if (int x = position.second + (y - position.first); west_is_clear && x >= 1 && spotOccupied({y, x})) {
+        moves.push_back({y, x});
+        west_is_clear = false;
+      }
+    }
+
+    // west
+    for (int x = position.second - 1; x >= 1; x--) {
+      if (std::pair<int, int> curr_coord = {position.first, x}; spotOccupied(curr_coord)) {
+        moves.push_back(curr_coord);
+        break;
+      }
+    }
+
+  } else {  // only remaining case is if piece_type == KING
+    // north
+    if (int y = position.first + 1; y <= 4) {
+      moves.push_back({y, position.second});
+      // northeast
+      if (int x = position.second + 1; x <= 4 && spotOccupied({y, x})) {
+        moves.push_back({y, x});
+      }
+      // northwest
+      if (int x = position.second - 1; x >= 1 && spotOccupied({y, x})) {
+        moves.push_back({y, x});
+      }
+    }
+    // east
+    if (int x = position.second + 1; x <= 4 && spotOccupied({position.first, x})) {
+      moves.push_back({position.first, x});
+    }
+    // west
+    if (int x = position.second - 1; x >= 1 && spotOccupied({position.first, x})) {
+      moves.push_back({position.first, x});
+    }
+    // south
+    if (int y = position.first - 1; y >= 1) {
+      if (std::pair<int, int> curr_coord{y, position.second}; spotOccupied(curr_coord)) {
+        moves.push_back(curr_coord);
+      }
+      // southeast
+      if (int x = position.second + 1; x <= 4 && spotOccupied({y, x})) {
+        moves.push_back({y, x});
+      }
+      // southwest
+      if (int x = position.second - 1; x >= 1 && spotOccupied({y, x})) {
+        moves.push_back({y, x});
+      }
+    }
   }
 
   return moves;

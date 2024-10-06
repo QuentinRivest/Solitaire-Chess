@@ -19,26 +19,18 @@ class Piece {
     const std::string& getName() const;
     void setPosition(const std::pair<int, int>& position);
     const std::pair<int, int>& getPosition() const;
-    void setRange();
-    const std::vector<std::pair<int, int>>& getRange() const;
     const std::array<std::string, 7>& getImage() const;
 
   private:
     PieceType::PieceType piece_type_;
     std::pair<int, int> position_;
     std::string name_;
-    std::vector<std::pair<int, int>> range_;
     std::array<std::string, 7> image_;
 };
 
 namespace {
   // returns name based on piece ID
   std::string createName(PieceType::PieceType piece_type);
-
-  // takes piece ID and position of chess piece
-  // returns vector of int-int pairs for range of piece
-  std::vector<std::pair<int, int>> createRange(PieceType::PieceType piece_type,
-                                               const std::pair<int, int>& position);
 
   // takes piece ID
   // returns vector of std::string's representing image of chess piece

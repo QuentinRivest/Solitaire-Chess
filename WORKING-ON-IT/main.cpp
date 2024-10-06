@@ -1,10 +1,14 @@
 #include <iostream>
 #include <string>
+#include <utility>
 
 #include "chessboard.hpp"
 #include "coord-conversions.hpp"
 #include "piece.hpp"
 #include "piece-type-enum.hpp"
+
+
+/* HELPER FUNCTIONS FOR MAIN*/
 
 namespace {
   const std::string line{
@@ -50,7 +54,7 @@ namespace {
     ex2_board.printBoard();
     std::cout << "\nYou're free to move any piece in any legal way, as long as "
               << "it's an attack.\nMeaning you're also allowed to move the same"
-              << " piece mulitiple times in a row.\n\n";
+              << " piece multiple times in a row.\n\n";
     enter_and_example();
 
     ex2_board.updateBoard({3, 1}, {2, 1});
@@ -88,12 +92,12 @@ int main() {
     tutorial();
   }
 
-  // GAMEPLAY BEGINS, going to title screen
+  // GAME-PLAY BEGINS, going to title screen
 
   // setting default val. for level
   int level{ 1 };
 
-  while (true) { // LOOP1: this loop containes whole operation of game
+  while (true) { // LOOP1: this loop contains whole operation of game
     // print main menu
     std::cout << line << "\t\t\t      LEVEL SELECT\n" << line;
     std::cout << "Easy:\n\t[ 1] [ 2] [ 3] [ 4] [ 5]\n\n"
@@ -112,11 +116,11 @@ int main() {
       std::cout << "Please try again.\n\n";
       enter_to_continue();
       continue;
-    } else if ((lvl_choice.at(0) == 'q') || (lvl_choice.at(0) == 'Q')) {
+    } else if ((lvl_choice[0] == 'q') || (lvl_choice[0] == 'Q')) {
       break;
       // if the first char in lvl_choice is a digit between 1 and 9, inclusive
-    } else if (std::isdigit(lvl_choice.at(0)) && (lvl_choice.at(0) > 48) &&
-                (lvl_choice.at(0) < 58)) {
+    } else if (std::isdigit(lvl_choice[0]) && (lvl_choice[0] > 48) &&
+                (lvl_choice[0] < 58)) {
       level = std::stoi(lvl_choice.substr(0,1));
       // if lvl_choice is longer than 1 AND a digit AND either:
       //  (level is currently 1 AND the 2nd char in lvl_choice is between 0
@@ -171,8 +175,8 @@ int main() {
         enter_to_continue();
         // goes back to beginning of this while loop
         continue;
-      } else if (!(is_first_move) && ( (user_choice.at(0) == 'r') ||
-                  (user_choice.at(0) == 'R') )) {
+      } else if (!(is_first_move) && ( (user_choice[0] == 'r') ||
+                  (user_choice[0] == 'R') )) {
           // ^if this is not the first move in the level,
           // AND if the first character in the user's input is 'r' or 'R'...
 
@@ -184,7 +188,7 @@ int main() {
         board = new_board;
         // goes back to beginning of LOOP 2
         continue;
-      } else if ((user_choice.at(0) == 'b') || (user_choice.at(0) == 'B')) {
+      } else if ((user_choice[0] == 'b') || (user_choice[0] == 'B')) {
           // ^if first character of user's input is 'b' or 'B'...
         // breaks this while loop (LOOP 2), going back to LOOP 1 (i.e., going
         // back to main menu)
@@ -200,8 +204,6 @@ int main() {
         initial_spot = Coords::displayToCoord(user_choice.substr(0,2));
         // if the coordinate the user entered does exist,
         // AND if that coordinate is occupied by a non-empty Piece obj...
-        std::cout << "CHECK 1: " << initial_spot.first << ", " << initial_spot.second << " - "
-                  << std::boolalpha << board.spotOccupied(initial_spot) << '\n';
         if ((initial_spot.first > 0) && board.spotOccupied(initial_spot)) {
           // set 'piece_name' equal to the name of the piece that is at the
           // selected coordinate on the board
@@ -213,7 +215,7 @@ int main() {
                       << "in which it attacks another piece.\n"
                       << "It is required that all moves be an attack.\n"
                       << "Please try again with a different piece.\n\n";
-            // haults progression of program till user presses 'enter'
+            // halts progression of program till user presses 'enter'
             enter_to_continue();
             // goes back to beginning of LOOP 2
             continue;
@@ -221,7 +223,7 @@ int main() {
           // confirms to user their piece selection and its location
           std::cout << "You selected the " << piece_name << " at "
                     << Coords::coordToDisplay(initial_spot) << ".\n\n";
-          // haults progression of program till user presses 'enter'
+          // halts progression of program till user presses 'enter'
           enter_to_continue();
         } else {
             // ^if, either, the coordinate DOESN'T exist,
@@ -230,20 +232,20 @@ int main() {
           // asks the user to try again
           std::cout << "Please try again with an occupied spot on the board."
                     << "\n\n";
-          // haults progression of program till user presses 'enter'
+          // halts progression of program till user presses 'enter'
           enter_to_continue();
           // goes back to beginning of LOOP 2
           continue;
         }
       } else {
           // ^if none of the above are true --
-          // if the first character of the user's input is NOT epmty, isn't an
+          // if the first character of the user's input is NOT empty, isn't an
           // upper-/lower-case 'r' or 'b', and isn't more than 1 character
           // long...
 
         // asks the user to try again
         std::cout << "Please try again.\n\n";
-        // haults progression of program till user presses 'enter'
+        // halts progression of program till user presses 'enter'
         enter_to_continue();
         // goes back to beginning of LOOP 2
         continue;
@@ -297,7 +299,7 @@ int main() {
         if (mv_choice.empty()) {
           // have them try again
           std::cout << "Please try again.\n\n";
-          // haults progression till user presses 'enter'
+          // halts progression till user presses 'enter'
           enter_to_continue();
           // goes back to beginning LOOP 3
           continue;
@@ -307,7 +309,7 @@ int main() {
         // if 'mv_choice' is a digit,
         // AND if that digit is between 1 and the size of the 'moves' vector
         // (inclusive of bounds)
-        if (std::isdigit(mv_choice.at(0)) && (std::stoi(mv_choice) > 0) &&
+        if (std::isdigit(mv_choice[0]) && (std::stoi(mv_choice) > 0) &&
             (std::stoi(mv_choice) <= moves.size())) {
           // an int-int pair that is the coordinate that the user selected to
           // be their selected piece's new spot to move to
@@ -331,7 +333,7 @@ int main() {
             // display board one last time
             board.printBoard();
             std::cout << "\nCongratulations! You beat this level!\n\n";
-            // haults progression till user presses 'enter'
+            // halts progression till user presses 'enter'
             enter_to_continue();
             // set level_beat to 'true'
             level_beaten = true;
@@ -343,7 +345,7 @@ int main() {
           // their selected new position
           std::cout << "You decided to move your " << piece_name << " to "
                     << Coords::coordToDisplay(new_spot) << ".\n\n";
-          // haults progression till user presses 'enter'
+          // halts progression till user presses 'enter'
           enter_to_continue();
           //
           break;
@@ -352,7 +354,7 @@ int main() {
             // inclusive (n being the number of elements in 'moves' vector)...
           // asks user to try again
           std::cout << "Please try again.\n\n";
-          // haults progression till user presses 'enter'
+          // halts progression till user presses 'enter'
           enter_to_continue();
         }
         // if break statement is not reached, LOOP 3 loops till user enters

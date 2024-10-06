@@ -41,7 +41,6 @@ namespace {
   // returns vector of ints representing the list of piece IDs in order of the
   // arrangement of pieces at the start of the given level
   std::array<PieceType::PieceType, 16> getLevelOutline(int level);
-
 }
 
 #endif
