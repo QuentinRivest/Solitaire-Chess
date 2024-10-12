@@ -1,4 +1,4 @@
-**SOLITAIRE CHESS**
+#**SOLITAIRE CHESS**#
 
 _Solitaire chess is a solo puzzle game using chess pieces and a 4x4 chess board where the objective is to have onlyl one piece remaining._
 _This game is operated through the terminal with user input._
