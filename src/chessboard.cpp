@@ -1,9 +1,9 @@
 #include <iostream>
 
-#include "chessboard.hpp"
-#include "coord-conversions.hpp"
-#include "piece.hpp"
-#include "piece-type-enum.hpp"
+#include "../include/chessboard.hpp"
+#include "../include/coord-conversions.hpp"
+#include "../include/piece.hpp"
+#include "../include/piece-type-enum.hpp"
 
 
 /* MEMBER FUNCTIONS */

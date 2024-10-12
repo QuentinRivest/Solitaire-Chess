@@ -1,8 +1,8 @@
 // definitions of (non-)member
 #include <iostream>
 
-#include "piece.hpp"
-#include "piece-type-enum.hpp"
+#include "../include/piece.hpp"
+#include "../include/piece-type-enum.hpp"
 
 
 /* MEMBER FUNCTIONS */

@@ -1,38 +1,18 @@
 #include <iostream>
 #include <string>
+#include <utility>
 
-#include "chessboard.h"
-#include "piece.h"
+#include "../include/chessboard.hpp"
+#include "../include/coord-conversions.hpp"
+#include "../include/piece.hpp"
+#include "../include/piece-type-enum.hpp"
+
+/* HELPER FUNCTIONS FOR MAIN*/
 
 namespace {
   const std::string line{
   "-----------------------------------------------------------------------\n"
   };
-
-  void testPrintPieces() {
-    for (int i = 0; i <= 6; i++) {
-      Piece piece{i, {2, 2}};
-
-      std::cout << "Name: " << piece.getName() << "\n"
-                << "Position: (" << piece.getPosition().first << ", "
-                << piece.getPosition().second << ")\n"
-                << "Range: ";
-      for (const std::pair<int, int>& coordinate : piece.getRange()) {
-        if (coordinate == piece.getRange().at(0)) {
-          std::cout << "(" << coordinate.first << ", " << coordinate.second
-                    << ")";
-          continue;
-        }
-        std::cout << ", " << "(" << coordinate.first << ", " << coordinate.second
-                  << ")";
-      }
-      std::cout << "\nImage:\n";
-      for (const std::string& line : piece.getImage()) {
-        std::cout << line << "\n";
-      }
-      std::cout << "\n";
-    }
-  }
 
   void enter_and_example() {
     std::string trash;
@@ -46,69 +26,84 @@ namespace {
     std::cout << "Press [ENTER] to continue. ";
     std::getline(std::cin, trash);
   }
+
+  void tutorial() {
+    Chessboard ex_board{0};
+    ex_board.printBoard();
+    std::cout << "\nAll chess pieces have the same movement rules as "
+              << "traditional chess.\n\nHowever, with Solitaire Chess, one MUST"
+              << " ATTACK with EACH MOVE.\n\nYour goal is to be left with "
+              << "exactly one chess piece.\n\n";
+    enter_and_example();
+
+    ex_board.updateBoard({3, 1}, {2, 1});
+    ex_board.printBoard();
+    std::cout << "\n*queen attacks knight at 2A*\n\nIn this 4x4 board, up is "
+              << "forward, so pawns can only move up.\n\n";
+    enter_and_example();
+
+    ex_board.updateBoard({3, 2}, {4, 3});
+    ex_board.printBoard();
+    std::cout << "\n*pawn attacks rook at 4C*\n\n";
+    std::cout << "NOTE: Pawns will always move diagonally, since they'll "
+              << "always be attacking.\n\n";
+    enter_and_example();
+
+    Chessboard ex2_board{0};
+    ex2_board.printBoard();
+    std::cout << "\nYou're free to move any piece in any legal way, as long as "
+              << "it's an attack.\nMeaning you're also allowed to move the same"
+              << " piece multiple times in a row.\n\n";
+    enter_and_example();
+
+    ex2_board.updateBoard({3, 1}, {2, 1});
+    ex2_board.printBoard();
+    std::cout << "\n*queen attacks knight at 2A*\n\n";
+    enter_and_example();
+
+    ex2_board.updateBoard({2, 1}, {3, 2});
+    ex2_board.printBoard();
+    enter_and_example();
+
+    ex2_board.updateBoard({3, 2}, {4, 3});
+    ex2_board.printBoard();
+    std::cout << "\n"
+              << line << "\t\t\t    END OF TUTORIAL\n"
+              << line << "\n";
+    enter_to_continue();
+    std::cout << "\n\n";
+  }
 }
 
-int main(int argc, char* argv[]) {
+int main() {
   // explain rules to user
   std::cout << line << "\t\t\t    SOLITAIRE CHESS\n" << line;
   std::cout << "Solitaire Chess is a one-player game with chess pieces and "
             << "a 4x4 board.\n\n";
   enter_and_example();
 
-  Chessboard ex_board{ 0 };
-  ex_board.printBoard();
-  std::cout << "\nAll chess pieces have the same movement rules as "
-            << "traditional chess.\n\nHowever, with Solitaire Chess, one MUST"
-            << " ATTACK with EACH MOVE.\n\nYour goal is to be left with "
-            << "exactly one chess piece.\n\n";
-  enter_and_example();
+  std::cout << "\nWould you like to skip the tutorial ('s') or view it ('v')?\n\n";
 
-  ex_board.updateBoard({3, 1}, {2, 1});
-  ex_board.printBoard();
-  std::cout << "\n*queen attacks knight at 2A*\n\nIn this 4x4 board, up is "
-            << "forward, so pawns can only move up.\n\n";
-  enter_and_example();
+  std::string tutorial_choice;
+  std::getline(std::cin, tutorial_choice);
 
-  ex_board.updateBoard({3, 2}, {4, 3});
-  ex_board.printBoard();
-  std::cout << "\n*pawn attacks rook at 4C*\n\n";
-  std::cout << "NOTE: Pawns will always move diagonally, since they'll "
-            << "always be attacking.\n\n";
-  enter_and_example();
+  if ( !(tutorial_choice.empty() || tutorial_choice[0] != 's' || tutorial_choice[0] != 'S') ) {
+    tutorial();
+  }
 
-  Chessboard ex2_board{ 0 };
-  ex2_board.printBoard();
-  std::cout << "\nYou're free to move any piece in any legal way, as long as "
-            << "it's an attack.\nMeaning you're also allowed to move the same"
-            << " piece mulitiple times in a row.\n\n";
-  enter_and_example();
+  // GAME-PLAY BEGINS, going to title screen
 
-  ex2_board.updateBoard({3, 1}, {2, 1});
-  ex2_board.printBoard();
-  std::cout << "\n*queen attacks knight at 2A*\n\n";
-  enter_and_example();
-
-  ex2_board.updateBoard({2, 1}, {3, 2});
-  ex2_board.printBoard();
-  enter_and_example();
-
-  ex2_board.updateBoard({3, 2}, {4, 3});
-  ex2_board.printBoard();
-  std::cout << "\n" << line << "\t\t\t    END OF TUTORIAL\n"
-            << line << "\n";
-  enter_to_continue();
-  std::cout << "\n\n";
-
+  // setting default val. for level
   int level{ 1 };
 
-  while (true) { // LOOP1: this loop containes whole operation of game
+  while (true) { // LOOP1: this loop contains whole operation of game
     // print main menu
     std::cout << line << "\t\t\t      LEVEL SELECT\n" << line;
     std::cout << "Easy:\n\t[ 1] [ 2] [ 3] [ 4] [ 5]\n\n"
               << "Intermediate:\n\t[ 6] [ 7] [ 8] [ 9] [10]\n\n"
               << "Advanced:\n\t[11] [12] [13] [14] [15]\n\n"
               << "Expert:\n\t[16] [17] [18] [19] [20]\n\n"
-              << line << "\t\t\t\t QUIT\n" << line
+              << line << "\t\t\t\tQUIT ('q')\n" << line
               << "\nEnter the number of the level you'd like to enter,\nor "
               << "enter \"q\" to quit: ";
     std::string lvl_choice;
@@ -120,11 +115,11 @@ int main(int argc, char* argv[]) {
       std::cout << "Please try again.\n\n";
       enter_to_continue();
       continue;
-    } else if ((lvl_choice.at(0) == 'q') || (lvl_choice.at(0) == 'Q')) {
+    } else if ((lvl_choice[0] == 'q') || (lvl_choice[0] == 'Q')) {
       break;
       // if the first char in lvl_choice is a digit between 1 and 9, inclusive
-    } else if (std::isdigit(lvl_choice.at(0)) && (lvl_choice.at(0) > 48) &&
-                (lvl_choice.at(0) < 58)) {
+    } else if (std::isdigit(lvl_choice[0]) && (lvl_choice[0] > 48) &&
+                (lvl_choice[0] < 58)) {
       level = std::stoi(lvl_choice.substr(0,1));
       // if lvl_choice is longer than 1 AND a digit AND either:
       //  (level is currently 1 AND the 2nd char in lvl_choice is between 0
@@ -175,12 +170,12 @@ int main(int argc, char* argv[]) {
       // if the user entered no characters at all, have them try again
       if (user_choice.empty()) {
         std::cout << "Please try again.\n\n";
-        // haults progression of program till user presses 'enter'
+        // halts progression of program till user presses 'enter'
         enter_to_continue();
         // goes back to beginning of this while loop
         continue;
-      } else if (!(is_first_move) && ( (user_choice.at(0) == 'r') ||
-                  (user_choice.at(0) == 'R') )) {
+      } else if (!(is_first_move) && ( (user_choice[0] == 'r') ||
+                  (user_choice[0] == 'R') )) {
           // ^if this is not the first move in the level,
           // AND if the first character in the user's input is 'r' or 'R'...
 
@@ -192,7 +187,7 @@ int main(int argc, char* argv[]) {
         board = new_board;
         // goes back to beginning of LOOP 2
         continue;
-      } else if ((user_choice.at(0) == 'b') || (user_choice.at(0) == 'B')) {
+      } else if ((user_choice[0] == 'b') || (user_choice[0] == 'B')) {
           // ^if first character of user's input is 'b' or 'B'...
         // breaks this while loop (LOOP 2), going back to LOOP 1 (i.e., going
         // back to main menu)
@@ -205,14 +200,13 @@ int main(int argc, char* argv[]) {
         // coordinate in int-char format and translates it to int-int pair
         // format (if these characters don't translate to any existing
         // coordinate, it'll return '{-1, -1}')
-        initial_spot = displayToCoord(user_choice.substr(0,2));
+        initial_spot = Coords::displayToCoord(user_choice.substr(0,2));
         // if the coordinate the user entered does exist,
         // AND if that coordinate is occupied by a non-empty Piece obj...
         if ((initial_spot.first > 0) && board.spotOccupied(initial_spot)) {
           // set 'piece_name' equal to the name of the piece that is at the
           // selected coordinate on the board
-          piece_name =
-            board.getBoard().at(coordToIndex(initial_spot)).getName();
+          piece_name = board[initial_spot].getName();
           // if selected piece has no moves...
           if (board.getMoves(initial_spot).empty()) {
             // explain that this piece has no moves and ask them to try again
@@ -220,15 +214,15 @@ int main(int argc, char* argv[]) {
                       << "in which it attacks another piece.\n"
                       << "It is required that all moves be an attack.\n"
                       << "Please try again with a different piece.\n\n";
-            // haults progression of program till user presses 'enter'
+            // halts progression of program till user presses 'enter'
             enter_to_continue();
             // goes back to beginning of LOOP 2
             continue;
           }
           // confirms to user their piece selection and its location
           std::cout << "You selected the " << piece_name << " at "
-                    << coordToDisplay(initial_spot) << ".\n\n";
-          // haults progression of program till user presses 'enter'
+                    << Coords::coordToDisplay(initial_spot) << ".\n\n";
+          // halts progression of program till user presses 'enter'
           enter_to_continue();
         } else {
             // ^if, either, the coordinate DOESN'T exist,
@@ -237,20 +231,20 @@ int main(int argc, char* argv[]) {
           // asks the user to try again
           std::cout << "Please try again with an occupied spot on the board."
                     << "\n\n";
-          // haults progression of program till user presses 'enter'
+          // halts progression of program till user presses 'enter'
           enter_to_continue();
           // goes back to beginning of LOOP 2
           continue;
         }
       } else {
           // ^if none of the above are true --
-          // if the first character of the user's input is NOT epmty, isn't an
+          // if the first character of the user's input is NOT empty, isn't an
           // upper-/lower-case 'r' or 'b', and isn't more than 1 character
           // long...
 
         // asks the user to try again
         std::cout << "Please try again.\n\n";
-        // haults progression of program till user presses 'enter'
+        // halts progression of program till user presses 'enter'
         enter_to_continue();
         // goes back to beginning of LOOP 2
         continue;
@@ -289,7 +283,7 @@ int main(int argc, char* argv[]) {
         std::cout << "\n";
         // lists each coordinate in 'moves' vector underneath the listed numbers
         for (const std::pair<int, int>& coord : moves) {
-          std::cout << " " << coordToDisplay(coord) << " ";
+          std::cout << " " << Coords::coordToDisplay(coord) << " ";
         }
         std::cout << "\n\nPlease enter the digit above the coordinate you'd "
                   << "like to move your piece to: ";
@@ -304,7 +298,7 @@ int main(int argc, char* argv[]) {
         if (mv_choice.empty()) {
           // have them try again
           std::cout << "Please try again.\n\n";
-          // haults prograssion till user presses 'enter'
+          // halts progression till user presses 'enter'
           enter_to_continue();
           // goes back to beginning LOOP 3
           continue;
@@ -314,7 +308,7 @@ int main(int argc, char* argv[]) {
         // if 'mv_choice' is a digit,
         // AND if that digit is between 1 and the size of the 'moves' vector
         // (inclusive of bounds)
-        if (std::isdigit(mv_choice.at(0)) && (std::stoi(mv_choice) > 0) &&
+        if (std::isdigit(mv_choice[0]) && (std::stoi(mv_choice) > 0) &&
             (std::stoi(mv_choice) <= moves.size())) {
           // an int-int pair that is the coordinate that the user selected to
           // be their selected piece's new spot to move to
@@ -328,7 +322,7 @@ int main(int argc, char* argv[]) {
           // counts how many pieces are on the board
           int counter{0};
           for (const Piece& piece : board.getBoard()) {
-            if (piece.getPieceId() != 0) {
+            if (piece.getPieceType() != 0) {
               counter++;
             }
           }
@@ -338,7 +332,7 @@ int main(int argc, char* argv[]) {
             // display board one last time
             board.printBoard();
             std::cout << "\nCongratulations! You beat this level!\n\n";
-            // haults prograssion till user presses 'enter'
+            // halts progression till user presses 'enter'
             enter_to_continue();
             // set level_beat to 'true'
             level_beaten = true;
@@ -349,8 +343,8 @@ int main(int argc, char* argv[]) {
           // confirms to user their decision to move their selected piece to
           // their selected new position
           std::cout << "You decided to move your " << piece_name << " to "
-                    << coordToDisplay(new_spot) << ".\n\n";
-          // haults prograssion till user presses 'enter'
+                    << Coords::coordToDisplay(new_spot) << ".\n\n";
+          // halts progression till user presses 'enter'
           enter_to_continue();
           //
           break;
@@ -359,7 +353,7 @@ int main(int argc, char* argv[]) {
             // inclusive (n being the number of elements in 'moves' vector)...
           // asks user to try again
           std::cout << "Please try again.\n\n";
-          // haults prograssion till user presses 'enter'
+          // halts progression till user presses 'enter'
           enter_to_continue();
         }
         // if break statement is not reached, LOOP 3 loops till user enters
