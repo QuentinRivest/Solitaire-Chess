@@ -1,3 +1,0 @@
-/home/venicio/Code-Stuffs/Projects/Solitaire-Chess/build/CMakeFiles/src_files.dir
-/home/venicio/Code-Stuffs/Projects/Solitaire-Chess/build/CMakeFiles/edit_cache.dir
-/home/venicio/Code-Stuffs/Projects/Solitaire-Chess/build/CMakeFiles/rebuild_cache.dir

@@ -1,4 +1,12 @@
+# Anyhting in the "build/"" Directory
+build/*
+
+
+
 ## DEFAULT C++ .GITIGNORE FILE from Github https://github.com/github/gitignore/blob/main/C%2B%2B.gitignore
+##
+## (was said to be goo dpractice to keep this full list for .gitignore, even if not all are necessary
+## incase they were to be added later)
 
 # Prerequisites
 *.d
