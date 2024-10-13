@@ -4,5 +4,8 @@ project(SolitaireChess)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(src_files src/main.cpp src/chessboard.cpp src/piece.cpp src/coord-conversions.cpp)
-target_include_directories(src_files PUBLIC include)
+add_executable(SolitaireChess ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp src/chessboard.cpp
+                         ${CMAKE_CURRENT_SOURCE_DIR}/src/piece.cpp
+                         ${CMAKE_CURRENT_SOURCE_DIR}/src/coord-conversions.cpp
+              )
+target_include_directories(SolitaireChess PUBLIC include)
