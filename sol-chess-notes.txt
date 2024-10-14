@@ -1,3 +1,0 @@
-TODO:
-
-Make a helper func. in main to simplify user-input.
